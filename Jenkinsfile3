@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "prashik536/jenkins-test"
         IMAGE_TAG = "v1.0"
         CONTAINER_NAME = "jenkins-test"
-        PORT = "8080"
+        PORT = "8085"
     }
 
     stages {

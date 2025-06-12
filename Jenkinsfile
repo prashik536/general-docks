@@ -1,15 +1,5 @@
 pipeline {
     agent any
-
-    environment {
-        MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
-    }
-
-    tools {
-        maven 'Maven 3.8.1'   // Use the Maven version configured in Jenkins Global Tools
-        jdk 'JDK 11'          // Use the JDK version configured in Jenkins Global Tools
-    }
-
     stages {
         stage('Checkout') {
             steps {

@@ -1,21 +1,51 @@
 pipeline {
-    agent { label 'slave1' }  // Use the label of your agent
+    agent any
+
+    environment {
+        MAVEN_OPTS = '-Dmaven.test.failure.ignore=false'
+    }
+
+    tools {
+        maven 'Maven 3.8.1'   // Use the Maven version configured in Jenkins Global Tools
+        jdk 'JDK 11'          // Use the JDK version configured in Jenkins Global Tools
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Checking out code...'
+                echo '📥 Cloning repository...'
                 checkout scm
             }
         }
-        stage('Build') {
+
+        stage('Build & Test') {
             steps {
-                sh 'mvn clean compile'
+                echo '🔧 Running mvn clean test...'
+                sh 'mvn clean test'
             }
         }
-        stage('Test') {
+
+        stage('Package') {
             steps {
-                sh 'mvn test'
+                echo '📦 Packaging application...'
+                sh 'mvn package'
             }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                echo '📁 Archiving built jar...'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build and tests succeeded!'
+        }
+        failure {
+            echo '❌ Build or tests failed.'
         }
     }
 }

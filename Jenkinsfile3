@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "prashik536/jenkins-test"
+        IMAGE_TAG = "v1.0"
+        CONTAINER_NAME = "jenkins-test"
+        PORT = "8080"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+               checkout scm
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Docker Pull Image') {
+            steps {
+                sh "docker pull ${IMAGE_NAME}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Docker Run Container') {
+            steps {
+                sh '''
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                    docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${IMAGE_NAME}:${IMAGE_TAG}
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
+        }
+    }
+}

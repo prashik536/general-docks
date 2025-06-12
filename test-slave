@@ -1,0 +1,15 @@
+pipeline {
+    agent { label 'slave1' }  // Replace with your agent's label
+
+    stages {
+        stage('Check Agent') {
+            steps {
+                echo "Running on agent: ${env.NODE_NAME}"
+                sh 'hostname'
+                sh 'whoami'
+                sh 'pwd'
+                sh 'echo Agent is working fine!'
+            }
+        }
+    }
+}
